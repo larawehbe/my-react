@@ -6,7 +6,7 @@ from enum import Enum
 openai.api_key = ""
 headers = {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer T'
+    'Authorization': 'Bearer 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'
 }
 openaiCompletionUrl = " https://api.openai.com/v1/completions"
 
@@ -27,7 +27,7 @@ class Material(Enum):
     GOLD = 'gold'
     DIAMOND = 'diamond'
     SILVER = 'silver'
-    PRECIOUSSTONES = 'preciousstones'
+    PRECIOUSSTONES = 'precious stones'
 
 
 ACCEPTED_MATERIALS = [i.value for i in Material]
@@ -48,6 +48,10 @@ ACCEPTED_STYLE = [i.value for i in Style]
 
 
 def generate_prompt(product, material, gender, style, custom_names=None):
+    if len(material) == 1:
+        material = material[0]
+    else:
+        material = ", ".join(x for x in material)
     prompt = f"Write a prompt for DALL-E to generate a {material} {product}, "
     if custom_names:
         prompt += f"with custom names: {custom_names}, "
@@ -60,7 +64,7 @@ def generate_prompt(product, material, gender, style, custom_names=None):
     result = result['choices'][0]['text']
 
     print(result)
-    return result
+    return prompt, result
 
 
 def generate_image(prompt):
@@ -89,7 +93,8 @@ def generate_jewelery(form_data):
 
     custom_names = form_data.get('names', None)
     print(f'custom names: {custom_names}')
-    prompt = generate_prompt(product, material, gender, style, custom_names)
-    images = generate_image(prompt)
-    images['prompt'] = prompt
+    prompt_sent, prompt_generated = generate_prompt(product, material, gender, style, custom_names)
+    images = generate_image(prompt_generated)
+    images['prompt_sent'] = prompt_sent
+    images['prompt_generated'] = prompt_generated
     return True, images

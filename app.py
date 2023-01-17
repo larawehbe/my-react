@@ -21,11 +21,12 @@ def home():
         success, message = generate_jewelery(request.form)
         if success:
             print(message)
-            prompt = message['prompt']
-
+            prompt_sent = message['prompt_sent']
+            prompt_generated = message['prompt_generated']
             images = [i['url'] for i in message['data']]
 
-            return render_template('base.html', images=images, prompt=prompt)
+            return render_template('base.html', images=images, prompt_sent=prompt_sent,
+                                   prompt_generated=prompt_generated    )
         else:
             return render_template('base.html', error=message)
 
